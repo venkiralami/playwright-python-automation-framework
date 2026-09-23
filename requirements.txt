@@ -1,0 +1,8 @@
+playwright
+pytest
+pytest-playwright  #The installed pytest-playwright plugin provides the page fixture.
+pytest-xdist
+pytest-html
+PyYAML  # YAML is convenient for hierarchical configuration/ Configuration files should handle environment-dependent values: /This is called separation of concern
+requests # API testing
+Faker 

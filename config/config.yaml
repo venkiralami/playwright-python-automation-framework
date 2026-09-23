@@ -1,0 +1,26 @@
+qa:
+  base_url: "https://opensource-demo.orangehrmlive.com/"
+  api_base_url: "https://jsonplaceholder.typicode.com"
+  username: "Admin"
+  password: "admin123"  
+  timeout: 30000
+  headless: false
+  testenv: qa
+
+uat:
+  base_url: "https://www.saucedemo.com/"
+  api_base_url: "https://jsonplaceholder.typicode.com"
+  username: "Standard_User"
+  password: "secret_sauce"
+  timeout: 30000
+  headless: true
+  testenv: uat
+
+stage:
+  base_url: "https://www.saucedemo.com/stage"
+  api_base_url: "https://jsonplaceholder.typicode.com"
+  username: "Standard_User"
+  password: "secret_sauce"
+  timeout: 30000
+  headless: true
+  testenv: stage

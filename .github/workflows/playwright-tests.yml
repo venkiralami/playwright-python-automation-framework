@@ -86,12 +86,12 @@ jobs:
           APP_USERNAME: ${{ secrets.APP_USERNAME }}
           APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
         run: |
-          python -m pytest  \
+          python -m pytest -m "not debug"\
             --env=qa \
             --browser chromium \
             -n 2 \
-           # --tracing retain-on-failure \
-           # --screenshot only-on-failure \
+            --tracing retain-on-failure \
+            --screenshot only-on-failure \
             --html=reports/ui-report.html \
             --self-contained-html
 

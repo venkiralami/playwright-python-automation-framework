@@ -1,5 +1,5 @@
 
-name: QA Quality Gates
+name: QA Quality Gates YML
 
 on:
   pull_request:

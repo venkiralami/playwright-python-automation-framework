@@ -1,0 +1,62 @@
+
+name: QA Quality Gates
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  schedule:
+    # Runs daily at 06:00 UTC.
+    - cron: "0 6 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  smoke-tests:
+    name: PR Smoke Tests
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: |
+          python -m pytest -m smoke --env=qa --browser chromium -v
+
+  nightly-tests:
+    name: Nightly Regression Tests
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run regression suite
+        run: |
+          python -m pytest -m "api or ui or hybrid" --env=qa --browser chromium -v

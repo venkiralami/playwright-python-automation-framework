@@ -17,7 +17,7 @@ def test_orangehrm_title(page: Page):
 
     #expect("intentionally failing to test hook failure handling").to_be_visible()
 
-@pytest.mark.smoke
+
 @pytest.mark.ui
 @pytest.mark.test
 def test_valid_login(page: Page):

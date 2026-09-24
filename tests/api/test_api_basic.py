@@ -6,6 +6,7 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+@pytest.mark.smoke
 @pytest.mark.api
 def test_get_users_withot_fixture():
 

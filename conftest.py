@@ -140,10 +140,6 @@ def user_factory(api_client, worker_id):
         created_users.append(created)
 
         logger.info(
-            "FACTORY - Created user: %s",
-            created,
-        )
-        logger.info(
             "WORKER %s - Created user: %s",
             worker_id,
             created,
@@ -167,8 +163,10 @@ def user_factory(api_client, worker_id):
                 )
 
                 logger.info(
-                    "FACTORY - Delete user %s: HTTP %s",
+                    "WORKER %s - Delete user %s (%s): HTTP %s",
+                    worker_id,
                     user_id,
+                    user.get("username"),
                     response.status_code,
                 )
 

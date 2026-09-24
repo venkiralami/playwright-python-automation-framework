@@ -43,26 +43,6 @@ def secret_credentials():
 SCREENSHOT_DIR = Path("screenshots")
 SCREENSHOT_DIR.mkdir(exist_ok=True)
 
-# Disabled because of the following error: "TypeError: 'NoneType' object is not callable" when using pytest-playwright plugin.
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-
-    outcome = yield
-
-    report = outcome.get_result()
-    
-    logger.info(f"Test {item} finished with status: {report.outcome}")
-    if report.when == "call" and report.failed:
-
-        page = item.funcargs.get("page")
-
-        if page:
-
-            safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)
-
-            screenshot_path = (SCREENSHOT_DIR / f"{safe_name}.png").resolve()
-
-            page.screenshot(path=str(screenshot_path), full_page=True)
 
 
 @pytest.fixture(scope="session")

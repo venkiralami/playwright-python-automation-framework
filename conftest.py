@@ -69,36 +69,40 @@ def secret_credentials():
 def api_client(config):
     return APIClient(config["api_base_url"])
 
+
 @pytest.fixture
 def created_user(api_client):
-
     user_data = generate_user()
 
     payload = {
         "name": f"{user_data['first_name']} {user_data['last_name']}",
         "username": user_data["username"],
-        "email": user_data["email"]
+        "email": user_data["email"],
     }
 
-    response = api_client.post(
-        "/users",
-        json=payload
+    response = api_client.post("/users", json=payload)
+    assert response.status_code == 201, (
+        f"User creation failed: {response.status_code} - {response.text}"
     )
 
-    assert response.status_code == 201
-
     created = response.json()
+    logger.info("SETUP - Created user: %s", created)
 
-    logger.info(f"SETUP - Created user: {created}")
-    print("\nSETUP - Created user:", created)
+    try:
+        yield created
+    finally:
+        user_id = created.get("id")
 
-    yield created
-
-    user_id = created.get("id")
-
-    if user_id:
-        delete_response = api_client.delete(
-            f"/users/{user_id}"
-        )
-        logger.info(f"TEARDOWN - Deleted user with id {user_id}. Status code: {delete_response.status_code}")  
-        print("\nTEARDOWN - Delete status:",  delete_response.status_code, "User id deleted:", user_id)
+        if user_id:
+            try:
+                delete_response = api_client.delete(f"/users/{user_id}")
+                logger.info(
+                    "TEARDOWN - Delete user %s returned status %s",
+                    user_id,
+                    delete_response.status_code,
+                )
+            except Exception:
+                logger.exception(
+                    "TEARDOWN - Failed to delete user %s",
+                    user_id,
+                )

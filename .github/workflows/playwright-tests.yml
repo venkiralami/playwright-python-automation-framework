@@ -1,5 +1,5 @@
 
-name: Playwright Python Automation CI
+name: Playwright Python Automation CI YML
 
 on:
   push:

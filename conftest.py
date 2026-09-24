@@ -40,29 +40,29 @@ def secret_credentials():
     return { "username": username_env, "password": password_env }
 
 # hook to get failed test screenshot. This hook is called after each test is executed, and it allows us to access the test report and take a screenshot if the test failed.
-SCREENSHOT_DIR = Path("screenshots")
-SCREENSHOT_DIR.mkdir(exist_ok=True)
+# SCREENSHOT_DIR = Path("screenshots")
+# SCREENSHOT_DIR.mkdir(exist_ok=True)
 
-# Disabled because of the following error: "TypeError: 'NoneType' object is not callable" when using pytest-playwright plugin.
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+# # Disabled because of the following error: "TypeError: 'NoneType' object is not callable" when using pytest-playwright plugin.
+# @pytest.hookimpl(hookwrapper=True)
+# def pytest_runtest_makereport(item, call):
 
-    outcome = yield
+#     outcome = yield
 
-    report = outcome.get_result()
+#     report = outcome.get_result()
     
-    logger.info(f"Test {item} finished with status: {report.outcome}")
-    if report.when == "call" and report.failed:
+#     logger.info(f"Test {item} finished with status: {report.outcome}")
+#     if report.when == "call" and report.failed:
 
-        page = item.funcargs.get("page")
+#         page = item.funcargs.get("page")
 
-        if page:
+#         if page:
 
-            safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)
+#             safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)
 
-            screenshot_path = (SCREENSHOT_DIR / f"{safe_name}.png").resolve()
+#             screenshot_path = (SCREENSHOT_DIR / f"{safe_name}.png").resolve()
 
-            page.screenshot(path=str(screenshot_path), full_page=True)
+#             page.screenshot(path=str(screenshot_path), full_page=True)
 
 
 @pytest.fixture(scope="session")

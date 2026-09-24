@@ -106,3 +106,74 @@ def created_user(api_client):
                     "TEARDOWN - Failed to delete user %s",
                     user_id,
                 )
+
+
+
+@pytest.fixture
+def user_factory(api_client, worker_id):
+    created_users = []
+
+    def create_user(
+        name=None,
+        username=None,
+        email=None,
+    ):
+        user_data = generate_user()
+
+        payload = {
+            "name": name or (
+                f"{user_data['first_name']} "
+                f"{user_data['last_name']}"
+            ),
+            "username": username or user_data["username"],
+            "email": email or user_data["email"],
+        }
+
+        response = api_client.post("/users", json=payload)
+
+        assert response.status_code == 201, (
+            f"User creation failed: "
+            f"{response.status_code} - {response.text}"
+        )
+
+        created = response.json()
+        created_users.append(created)
+
+        logger.info(
+            "FACTORY - Created user: %s",
+            created,
+        )
+        logger.info(
+            "WORKER %s - Created user: %s",
+            worker_id,
+            created,
+        )
+
+        return created
+
+    try:
+        yield create_user
+
+    finally:
+        for user in reversed(created_users):
+            user_id = user.get("id")
+
+            if not user_id:
+                continue
+
+            try:
+                response = api_client.delete(
+                    f"/users/{user_id}"
+                )
+
+                logger.info(
+                    "FACTORY - Delete user %s: HTTP %s",
+                    user_id,
+                    response.status_code,
+                )
+
+            except Exception:
+                logger.exception(
+                    "FACTORY - Failed to delete user %s",
+                    user_id,
+                )

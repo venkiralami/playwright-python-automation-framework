@@ -90,8 +90,8 @@ jobs:
             --env=qa \
             --browser chromium \
             -n 2 \
-            --tracing retain-on-failure \
-            --screenshot only-on-failure \
+           # --tracing retain-on-failure \
+           # --screenshot only-on-failure \
             --html=reports/ui-report.html \
             --self-contained-html
 

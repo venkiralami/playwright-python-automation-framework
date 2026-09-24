@@ -17,6 +17,6 @@ def test_api_setup_ui_validation(created_user, login_page):
     # UI VALIDATION
     # -------------------------
     login_page.login("Admin", "admin123")  
-    login_page.page.wait_for_timeout(5000)
+    login_page.page.wait_for_timeout(3000)
     expect(login_page.page).to_have_title("OrangeHRM")
     assert login_page.get_title() == "OrangeHRM" 

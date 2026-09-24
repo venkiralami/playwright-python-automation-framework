@@ -117,3 +117,67 @@ jobs:
             reports/logs/
           if-no-files-found: ignore
           retention-days: 7
+
+  
+  # ==========================================
+  # JOB 3: API + UI HYBRID TESTS
+  # ==========================================
+  hybrid-tests:
+    name: API and UI Hybrid Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Run hybrid tests
+        env:
+          APP_USERNAME: ${{ secrets.APP_USERNAME }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+        run: |
+          python -m pytest -m hybrid \
+            --env=qa \
+            --browser chromium \
+            -v \
+            --tracing retain-on-failure \
+            --screenshot only-on-failure \
+            --html=reports/hybrid-report.html \
+            --self-contained-html
+
+      - name: Upload hybrid HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-test-report
+          path: reports/hybrid-report.html
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload hybrid failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybrid-failure-artifacts
+          path: |
+            test-results/
+            screenshots/
+            traces/
+            reports/logs/
+          if-no-files-found: ignore
+          retention-days: 7

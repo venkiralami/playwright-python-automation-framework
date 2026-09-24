@@ -1,16 +1,27 @@
+
 name: Playwright Python Automation CI
 
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
+
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+
+  # ==========================================
+  # JOB 1: API TESTS
+  # ==========================================
   api-tests:
     name: API Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -33,10 +44,72 @@ jobs:
             --html=reports/api-report.html \
             --self-contained-html
 
-      - name: Upload API test report
+      - name: Upload API HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: api-test-report
           path: reports/api-report.html
           if-no-files-found: warn
+          retention-days: 7
+
+
+  # ==========================================
+  # JOB 2: PLAYWRIGHT UI TESTS
+  # ==========================================
+  ui-tests:
+    name: Playwright UI Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Run Playwright UI tests
+        run: |
+          python -m pytest -m "not api and not hybrid and not debug" \
+            --env=qa \
+            --browser chromium \
+            -n 2 \
+            --tracing retain-on-failure \
+            --screenshot only-on-failure \
+            --html=reports/ui-report.html \
+            --self-contained-html
+
+      - name: Upload UI HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-report
+          path: reports/ui-report.html
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            test-results/
+            screenshots/
+            traces/
+            reports/logs/
+          if-no-files-found: ignore
+          retention-days: 7

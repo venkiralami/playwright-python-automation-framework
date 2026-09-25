@@ -3,15 +3,15 @@ name: Playwright Python Automation CI YML
 
 on:
   push:
-    branches: [main]
+    # branches: [main]
 
   pull_request:
-    branches: [main]
+    # branches: [main]
 
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # contents: read
 
 jobs:
 

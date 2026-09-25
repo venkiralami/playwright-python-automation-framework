@@ -7,7 +7,7 @@ on:
       - main
 
   schedule:
-    # Runs daily at 06:00 UTC.    
+    # Runs daily at 06:00 UTC.
     - cron: "0 6 * * *"
 
   workflow_dispatch:
@@ -22,20 +22,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python with pip cache
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
       - name: Run smoke tests
         run: |
-          python -m pytest -m smoke --env=qa --browser chromium -v
+          mkdir -p reports
+          python -m pytest -m smoke --env=qa --browser chromium -v \
+            --html=reports/smoke-report.html \
+            --self-contained-html
+
+      - name: Upload smoke test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-smoke-report
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
 
   nightly-tests:
     name: Nightly Regression Tests
@@ -46,17 +60,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python with pip cache
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
       - name: Run regression suite
         run: |
-          python -m pytest -m "api or ui or hybrid" --env=qa --browser chromium -v
+          mkdir -p reports
+          python -m pytest -m "api or ui or hybrid" --env=qa --browser chromium -v \
+            --html=reports/regression-report.html \
+            --self-contained-html
+
+      - name: Upload regression test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-regression-report
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14

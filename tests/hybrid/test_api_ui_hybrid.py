@@ -14,7 +14,7 @@ def test_api_setup_ui_validation(created_user, login_page):
     assert created_user["username"]
 
     # -------------------------
-    # UI VALIDATION
+    # UI VALIDATION 
     # -------------------------
     login_page.login("Admin", "admin123")  
     login_page.page.wait_for_timeout(3000)
